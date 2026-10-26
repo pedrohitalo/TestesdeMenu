@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Central de Menus da Disciplina</title>
+  <style>
+    :root {
+      --ui-bg: #f8fafc;
+      --ui-surface: #ffffff;
+      --ui-border: #e2e8f0;
+      --ui-border-light: #f1f5f9;
+      --ui-text: #0f172a;
+      --ui-muted: #64748b;
+      --ui-primary: #004f91;
+      --ui-primary-hover: #003b6d;
+      --ui-orange: #e57409;
+      --ui-danger: #ef4444;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+      --shadow-card: 0 4px 16px -2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.03);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--ui-bg);
+      color: var(--ui-text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Topbar */
+    header {
+      background: var(--ui-surface);
+      border-bottom: 1px solid var(--ui-border);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      gap: 16px;
+      z-index: 30;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--ui-text);
+      white-space: nowrap;
+    }
+
+    /* Seletor do Tipo de Layout */
+    .menu-type-selector {
+      display: inline-flex;
+      background: #f1f5f9;
+      padding: 3px;
+      border-radius: var(--radius-sm);
+      gap: 3px;
+    }
+
+    .type-btn {
+      background: transparent;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--ui-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .type-btn:hover { color: var(--ui-text); }
+    .type-btn.active {
+      background: var(--ui-surface);
+      color: var(--ui-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .view-mode-group {
+      display: inline-flex;
+      background: #f1f5f9;
+      padding: 3px;
+      border-radius: var(--radius-sm);
+      gap: 2px;
+    }
+
+    .view-mode-btn {
+      background: transparent;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--ui-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .view-mode-btn:hover { color: var(--ui-text); }
+    .view-mode-btn.active {
+      background: var(--ui-surface);
+      color: var(--ui-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-action {
+      background: var(--ui-primary);
+      color: #fff;
+      border: none;
+      padding: 8px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-action:hover {
+      background: var(--ui-primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .app-container {
+      display: flex;
+      flex-direction: row;
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Painel do Editor */
+    .builder-panel {
+      width: 530px;
+      min-width: 350px;
+      max-width: calc(100vw - 360px);
+      flex-shrink: 0;
+      background: var(--ui-surface);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      border-right: 1px solid var(--ui-border);
+    }
+
+    .panel-header {
+      padding: 14px 20px;
+      background: #fafbfc;
+      border-bottom: 1px solid var(--ui-border);
+    }
+
+    .panel-header h2 {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--ui-text);
+      margin-bottom: 4px;
+    }
+
+    .panel-header p {
+      font-size: 0.76rem;
+      color: var(--ui-muted);
+      line-height: 1.4;
+    }
+
+    /* Barra de Ações Rápidas (Presets) */
+    .presets-bar {
+      padding: 8px 20px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--ui-border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .preset-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--ui-muted);
+      text-transform: uppercase;
+      margin-right: 2px;
+    }
+
+    .preset-btn {
+      background: var(--ui-surface);
+      border: 1px solid var(--ui-border);
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--ui-text);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .preset-btn:hover {
+      border-color: var(--ui-primary);
+      color: var(--ui-primary);
+    }
+
+    .items-container {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .item-card {
+      background: var(--ui-surface);
+      border: 1px solid var(--ui-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .item-card.is-disabled {
+      opacity: 0.52;
+      background: #f8fafc;
+      border-style: dashed;
+    }
+
+    .item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .item-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .item-thumb {
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
+      border-radius: 4px;
+      background: #f1f5f9;
+      border: 1px solid var(--ui-border);
+    }
+
+    .item-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ui-text);
+    }
+
+    .tag-badge {
+      font-size: 0.66rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .tag-orange { background: #ffedd5; color: #c2410c; }
+    .tag-blue { background: #e0f2fe; color: #0284c7; }
+
+    .card-actions-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .order-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--ui-muted);
+      cursor: pointer;
+      padding: 2px 5px;
+      font-size: 0.78rem;
+      border-radius: 3px;
+      font-weight: 700;
+    }
+
+    .order-btn:hover { background: #f1f5f9; color: var(--ui-text); }
+
+    .toggle-visibility {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--ui-muted);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle-visibility input {
+      accent-color: var(--ui-primary);
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+
+    .input-row {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .input-row label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--ui-muted);
+    }
+
+    .input-row input[type="text"] {
+      border: 1px solid var(--ui-border);
+      border-radius: var(--radius-sm);
+      padding: 6px 9px;
+      font-size: 0.8rem;
+      color: var(--ui-text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .input-row input[type="text"]:focus {
+      border-color: var(--ui-primary);
+    }
+
+    .flags-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #fafbfc;
+      padding: 5px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 0.73rem;
+    }
+
+    .flag-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500;
+      color: var(--ui-text);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .flag-label input[type="checkbox"] {
+      accent-color: var(--ui-primary);
+      width: 13px;
+      height: 13px;
+    }
+
+    /* Divisor Arrastável */
+    .resizer-bar {
+      width: 6px;
+      background: transparent;
+      cursor: col-resize;
+      user-select: none;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    .resizer-bar::after {
+      content: '';
+      position: absolute;
+      left: 2px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--ui-border);
+      transition: background 0.15s ease;
+    }
+
+    .resizer-bar:hover::after,
+    .resizer-bar.dragging::after {
+      background: var(--ui-primary);
+      width: 3px;
+    }
+
+    /* Painel de Prévia */
+    .preview-panel {
+      flex: 1;
+      min-width: 340px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #f8fafc;
+    }
+
+    .preview-tabs {
+      background: var(--ui-surface);
+      border-bottom: 1px solid var(--ui-border);
+      display: flex;
+      padding: 0 16px;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 12px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--ui-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn.active {
+      color: var(--ui-primary);
+      border-bottom-color: var(--ui-primary);
+    }
+
+    .view-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    #code-output {
+      width: 100%;
+      height: 100%;
+      background: #090d16;
+      color: #e2e8f0;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 18px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.82rem;
+      line-height: 1.55;
+      resize: none;
+      white-space: pre;
+    }
+
+    @media (max-width: 860px) {
+      .resizer-bar { display: none !important; }
+      .app-container { flex-direction: column; }
+      .builder-panel { width: 100% !important; max-width: 100% !important; height: 50vh; }
+      .preview-panel { width: 100% !important; height: 50vh; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-group">
+      <span class="brand-title">Central de Menus</span>
+      
+      <!-- Seletor dos dois tipos de menu -->
+      <div class="menu-type-selector">
+        <button class="type-btn active" id="type-btn-blocos" onclick="alternarTipoMenu('blocos')">
+          <span>🟦 Menu em Blocos</span>
+        </button>
+        <button class="type-btn" id="type-btn-icones" onclick="alternarTipoMenu('icones')">
+          <span>🖼️ Menu com Ícones</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <div class="view-mode-group">
+        <button class="view-mode-btn" id="btn-view-editor" onclick="setViewMode('editor-only')">Editor</button>
+        <button class="view-mode-btn active" id="btn-view-both" onclick="setViewMode('both')">Dividido</button>
+        <button class="view-mode-btn" id="btn-view-preview" onclick="setViewMode('preview-only')">Prévia</button>
+      </div>
+      <button class="btn-action" id="btn-copiar" onclick="copiarCodigo()">Copiar Código HTML</button>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <!-- PAINEL DE CONTROLE / EDIÇÃO -->
+    <div class="builder-panel" id="builder-panel">
+      <div class="panel-header" id="panel-header-content"></div>
+      <div class="presets-bar" id="panel-presets-bar"></div>
+      <div class="items-container" id="items-control-list"></div>
+    </div>
+
+    <!-- DIVISOR ARRASTÁVEL -->
+    <div class="resizer-bar" id="resizer-bar"></div>
+
+    <!-- PAINEL DE PRÉVIA -->
+    <div class="preview-panel" id="preview-panel">
+      <div class="preview-tabs">
+        <button class="tab-btn active" id="tab-preview-btn" onclick="mudarAba('preview')">Pré-visualização</button>
+        <button class="tab-btn" id="tab-code-btn" onclick="mudarAba('code')">Código Gerado</button>
+      </div>
+
+      <div class="view-container" id="preview-tab">
+        <div id="preview-mount"></div>
+      </div>
+
+      <div class="view-container" id="code-tab" style="display: none;">
+        <textarea id="code-output" readonly></textarea>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Tipo ativo: 'blocos' ou 'icones'
+    let tipoAtual = 'blocos';
+
+    // -------------------------------------------------------------
+    // DADOS: MENU EM BLOCOS (Layout 1)
+    // -------------------------------------------------------------
+    let botoesBlocos = [
+      {
+        id: 'btn-comece',
+        texto: 'COMECE POR AQUI',
+        url: '#',
+        targetBlank: false,
+        classeExtra: 'first-button-s',
+        badge: { texto: 'Destaque Laranja', tipo: 'tag-orange' },
+        ativo: true
+      },
+      {
+        id: 'btn-noticias',
+        texto: 'Notícias da Disciplina',
+        url: '#',
+        targetBlank: true,
+        classeExtra: '',
+        badge: null,
+        ativo: true
+      },
+      {
+        id: 'btn-agenda',
+        texto: 'Agenda da Disciplina',
+        url: '#',
+        targetBlank: true,
+        classeExtra: '',
+        badge: null,
+        ativo: true
+      },
+      {
+        id: 'btn-fale',
+        texto: 'Fale com Prof./Mediador',
+        url: '#',
+        targetBlank: false,
+        classeExtra: 'botao-destaque-final',
+        badge: { texto: 'Destaque Final (100%)', tipo: 'tag-blue' },
+        ativo: true
+      },
+      {
+        id: 'btn-avalie',
+        texto: 'Avalie sua Disciplina',
+        url: '#',
+        targetBlank: false,
+        classeExtra: '',
+        badge: null,
+        ativo: true
+      }
+    ];
+
+    const CSS_BLOCOS = `<style>
+  :root {
+    --primary-color: #004f91;
+    --first-button-s-color: #e57409;
+    --text-color-light: #ffffff;
+    --text-color-dark: #333333;
+    --border-radius: 10px; 
+    --button-min-width: 100px; 
+    --button-height: 70px; 
+  }
+
+  .menu-container-s {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    width: 100%;
+    max-width: 750px;
+    margin: 15px auto;
+    gap: 15px !important;
+    box-sizing: border-box;
+  }
+   
+  .menu-button-s {
+    order: 1; 
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 18%;
+    min-width: var(--button-min-width);
+    background-color: var(--primary-color);
+    color: var(--text-color-light) !important;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    padding: 15px;
+    height: var(--button-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid transparent;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease-in-out;
+    box-sizing: border-box;
+  }
+
+  .first-button-s {
+    background-color: var(--first-button-s-color) !important;
+    border-color: var(--first-button-s-color) !important;
+  }
+   
+  .menu-button-s:hover, .first-button-s:hover {
+    background-color: var(--text-color-light) !important;
+    transform: scale(1.05); 
+  }
+  .menu-button-s:hover {
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+  }
+  .first-button-s:hover {
+    color: var(--first-button-s-color) !important;
+    border-color: var(--first-button-s-color) !important;
+  }
+
+  .botao-destaque-final {
+    flex-basis: 100% !important;
+    order: 99;
+    margin-top: 5px;
+  }
+
+  @media (max-width: 600px) {
+    .menu-button-s {
+      font-size: 14px; 
+      padding: 10px; 
+      height: 50px; 
+      min-width: auto; 
+      flex-basis: 45%; 
+    }
+    .botao-destaque-final {
+      flex-basis: 100% !important;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .menu-button-s {
+      flex-basis: 100%; 
+    }
+  }
+</style>`;
+
+    // -------------------------------------------------------------
+    // DADOS: MENU COM ÍCONES (Layout 2 - Otimizado e Reordenável)
+    // -------------------------------------------------------------
+    let botoesIcones = [
+      {
+        id: 'aula-ao-vivo',
+        texto: 'Aula ao vivo',
+        imgSrc: 'https://digital.unisa.br/mod/resource/view.php?id=1644085&redirect=1',
+        url: '#',
+        targetBlank: false,
+        ativo: true
+      },
+      {
+        id: 'aula-aprofundamento',
+        texto: 'Aula de Aprofundamento',
+        imgSrc: 'https://digital.unisa.br/mod/resource/view.php?id=1707955&redirect=1',
+        url: '#',
+        targetBlank: false,
+        ativo: false
+      },
+      {
+        id: 'orientacao-supervisao',
+        texto: 'Orientação e Supervisão',
+        imgSrc: 'https://digital.unisa.br/mod/resource/view.php?id=1707953&redirect=1',
+        url: '#',
+        targetBlank: false,
+        ativo: false
+      },
+      {
+        id: 'entrega-relatorio',
+        texto: 'Entrega de Relatório',
+        imgSrc: 'https://digital.unisa.br/mod/resource/view.php?id=1707952&redirect=1',
+        url: '#',
+        targetBlank: false,
+        ativo: false
+      },
+      {
+        id: 'entrega-pi',
+        texto: 'Entrega do Projeto Integrador',
+        imgSrc: 'https://digital.unisa.br/mod/resource/view.php?id=1707951&redirect=1',
+        url: '#',
+        targetBlank: false,
+        ativo: false
+      },
+      {
+        id: 'entrega-tcc',
+        texto: 'Entrega do TCC',
+        imgSrc: 'https://digital.unisa.br/mod/resource/view.php?id=1707949&redirect=1',
+        url: '#',
+        targetBlank: false,
+        ativo: false
+      },
+      {
+        id: 'avaliacao-continua',
+        texto: 'Avaliação Contínua',
+        imgSrc: 'https://digital.unisa.br/mod/resource/view.php?id=1644086&redirect=1',
+        url: '#',
+        targetBlank: false,
+        ativo: true
+      },
+      {
+        id: 'avaliacao-integrada',
+        texto: 'Avaliação Integrada',
+        imgSrc: 'https://digital.unisa.br/mod/resource/view.php?id=1644087&redirect=1',
+        url: '#',
+        targetBlank: false,
+        ativo: true
+      },
+      {
+        id: 'avaliacao-global',
+        texto: 'Avaliação Global',
+        imgSrc: 'https://digital.unisa.br/mod/resource/view.php?id=1644088&redirect=1',
+        url: '#',
+        targetBlank: true,
+        ativo: true
+      },
+      {
+        id: 'whatsapp',
+        texto: 'Whatsapp',
+        imgSrc: 'https://digital.unisa.br/mod/resource/view.php?id=1644089&redirect=1',
+        url: '[whatsapptutor]',
+        targetBlank: true,
+        ativo: false
+      },
+      {
+        id: 'material-apoio',
+        texto: 'Material de apoio',
+        imgSrc: 'https://digital.unisa.br/mod/resource/view.php?id=1644084&redirect=1',
+        url: '#',
+        targetBlank: false,
+        ativo: true
+      }
+    ];
+
+    const CSS_ICONES = `<style>
+    :root {
+        --cor-fundo-transparente: transparent;
+        --cor-linha: #004f91;
+    }
+
+    .menu-container-i {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 900px !important;
+        margin: 0;
+        gap: 20px !important;
+        padding: 0 10px;
+        box-sizing: border-box;
+        background-color: var(--cor-fundo-transparente) !important;
+    }
+    
+    .menu-row-i {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .menu-item-i {
+        background-color: var(--cor-fundo-transparente) !important;
+        border: none !important;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: center;
+        text-decoration: none;
+        flex: 1;
+        min-width: 0;
+        transition: transform 0.3s ease-in-out, border-bottom 0.3s ease-in-out;
+        color: inherit;
+        border-bottom: 5px solid transparent !important;
+    }
+    
+    .menu-item-i img {
+        margin: 15px 0 0 0 !important;
+        width: 100px;
+        height: 100px;
+        transition: transform 0.3s ease-in-out;
+    }
+    
+    .menu-item-i .menu-text-i {
+        margin: 15px 1px 1px 1px !important;
+        padding: 0;
+        font-size: 16px !important;
+        color: #444;
+        font-weight: bold;
+        width: 100%;
+        line-height: 1.2;
+    }
+
+    .menu-item-i:hover {
+        border-bottom: 5px solid var(--cor-linha) !important;
+    }
+    
+    .menu-item-i:hover img {
+        transform: scale(1.2);
+    }
+
+    @media (max-width: 768px) {
+       .menu-row-i {
+           flex-wrap: wrap;
+           justify-content: center;
+       }
+       .menu-item-i {
+           flex: 1 1 120px;
+       }
+    }
+</style>`;
+
+    // -------------------------------------------------------------
+    // RENDERIZAÇÃO DO EDITOR
+    // -------------------------------------------------------------
+    function alternarTipoMenu(tipo) {
+      tipoAtual = tipo;
+      document.getElementById('type-btn-blocos').classList.toggle('active', tipo === 'blocos');
+      document.getElementById('type-btn-icones').classList.toggle('active', tipo === 'icones');
+      renderEditor();
+      atualizar();
+    }
+
+    function renderEditor() {
+      const headerEl = document.getElementById('panel-header-content');
+      const presetsEl = document.getElementById('panel-presets-bar');
+      const containerEl = document.getElementById('items-control-list');
+      containerEl.innerHTML = '';
+
+      if (tipoAtual === 'blocos') {
+        headerEl.innerHTML = `
+          <h2>Menu em Blocos (Grid S)</h2>
+          <p>Ative os botões desejados, insira os links de destino e use as setas para alterar a ordem visual dos botões.</p>
+        `;
+        presetsEl.innerHTML = `
+          <span class="preset-label">Ações:</span>
+          <button class="preset-btn" onclick="aplicarPresetBlocos('todos')">Exibir Todos</button>
+          <button class="preset-btn" onclick="aplicarPresetBlocos('padrao')">Padrão Inicial</button>
+        `;
+
+        botoesBlocos.forEach((btn, index) => {
+          const card = document.createElement('div');
+          card.className = `item-card ${btn.ativo ? '' : 'is-disabled'}`;
+
+          let badgeHtml = '';
+          if (btn.badge) {
+            badgeHtml = `<span class="tag-badge ${btn.badge.tipo}">${btn.badge.texto}</span>`;
+          }
+
+          card.innerHTML = `
+            <div class="item-header">
+              <div class="item-title-group">
+                <span class="item-label">${escapeHtml(btn.texto)}</span>
+                ${badgeHtml}
+              </div>
+              <div class="card-actions-right">
+                <button class="order-btn" title="Mover para cima" onclick="moverBloco(${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲</button>
+                <button class="order-btn" title="Mover para baixo" onclick="moverBloco(${index}, 1)" ${index === botoesBlocos.length - 1 ? 'disabled' : ''}>▼</button>
+                <label class="toggle-visibility">
+                  <input type="checkbox" ${btn.ativo ? 'checked' : ''} onchange="atualizarVisibilidadeBloco(${index}, this.checked)">
+                  <span>${btn.ativo ? 'Visível' : 'Oculto'}</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="input-row">
+              <label>Texto do Botão:</label>
+              <input type="text" value="${escapeHtml(btn.texto)}" oninput="atualizarTextoBloco(${index}, this.value)" ${btn.ativo ? '' : 'disabled'}>
+            </div>
+
+            <div class="input-row">
+              <label>Link de Destino (href):</label>
+              <input type="text" value="${escapeHtml(btn.url)}" placeholder="https://..." oninput="atualizarUrlBloco(${index}, this.value)" ${btn.ativo ? '' : 'disabled'}>
+            </div>
+
+            <div class="flags-row">
+              <label class="flag-label" title="Abrir link em nova aba">
+                <input type="checkbox" ${btn.targetBlank ? 'checked' : ''} onchange="atualizarTargetBloco(${index}, this.checked)" ${btn.ativo ? '' : 'disabled'}>
+                Abrir em Nova Aba (target="_blank")
+              </label>
+            </div>
+          `;
+          containerEl.appendChild(card);
+        });
+
+      } else {
+        // Menu com Ícones
+        headerEl.innerHTML = `
+          <h2>Menu com Ícones e Imagens (Grid I)</h2>
+          <p>Organize a ordem dos ícones pelas setas (▲/▼), ligue ou desligue botões e defina links e destinos.</p>
+        `;
+        presetsEl.innerHTML = `
+          <span class="preset-label">Predefinições:</span>
+          <button class="preset-btn" onclick="aplicarPresetIcones('padrao')">Padrão da Disciplina (5)</button>
+          <button class="preset-btn" onclick="aplicarPresetIcones('tcc')">Estágio & TCC</button>
+          <button class="preset-btn" onclick="aplicarPresetIcones('todos')">Todos</button>
+          <button class="preset-btn" onclick="aplicarPresetIcones('limpar')">Ocultar Todos</button>
+          <button class="preset-btn" style="color:var(--ui-primary); margin-left:auto;" onclick="adicionarIconeCustom()">+ Novo Ícone</button>
+        `;
+
+        botoesIcones.forEach((btn, index) => {
+          const card = document.createElement('div');
+          card.className = `item-card ${btn.ativo ? '' : 'is-disabled'}`;
+
+          card.innerHTML = `
+            <div class="item-header">
+              <div class="item-title-group">
+                <img src="${btn.imgSrc}" alt="${escapeHtml(btn.texto)}" class="item-thumb" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'30\' height=\'30\' fill=\'%2394a3b8\' viewBox=\'0 0 16 16\'><rect width=\'16\' height=\'16\' rx=\'2\' fill=\'%23f1f5f9\'/><text x=\'50%\' y=\'55%\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-size=\'8\'>IMG</text></svg>'">
+                <span class="item-label">${escapeHtml(btn.texto)}</span>
+              </div>
+              <div class="card-actions-right">
+                <button class="order-btn" title="Mover para a esquerda / cima" onclick="moverIcone(${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲</button>
+                <button class="order-btn" title="Mover para a direita / baixo" onclick="moverIcone(${index}, 1)" ${index === botoesIcones.length - 1 ? 'disabled' : ''}>▼</button>
+                <label class="toggle-visibility">
+                  <input type="checkbox" ${btn.ativo ? 'checked' : ''} onchange="atualizarVisibilidadeIcone(${index}, this.checked)">
+                  <span>${btn.ativo ? 'Visível' : 'Oculto'}</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="input-row">
+              <label>Título do Ícone:</label>
+              <input type="text" value="${escapeHtml(btn.texto)}" oninput="atualizarTextoIcone(${index}, this.value)" ${btn.ativo ? '' : 'disabled'}>
+            </div>
+
+            <div class="input-row">
+              <label>Link de Destino (href):</label>
+              <input type="text" value="${escapeHtml(btn.url)}" placeholder="https://..." oninput="atualizarUrlIcone(${index}, this.value)" ${btn.ativo ? '' : 'disabled'}>
+            </div>
+
+            <div class="flags-row">
+              <label class="flag-label">
+                <input type="checkbox" ${btn.targetBlank ? 'checked' : ''} onchange="atualizarTargetIcone(${index}, this.checked)" ${btn.ativo ? '' : 'disabled'}>
+                Abrir em Nova Aba (target="_blank")
+              </label>
+              <span style="color:#cbd5e1;">|</span>
+              <a href="javascript:void(0)" style="color:var(--ui-muted); font-size:0.72rem; text-decoration:underline;" onclick="editarImagemUrl(${index})">Alterar imagem</a>
+              ${btn.isCustom ? `<a href="javascript:void(0)" style="color:var(--ui-danger); font-size:0.72rem; text-decoration:underline; margin-left:auto;" onclick="removerIconeCustom(${index})">Remover</a>` : ''}
+            </div>
+          `;
+          containerEl.appendChild(card);
+        });
+      }
+    }
+
+    // -------------------------------------------------------------
+    // GERAÇÃO DO HTML EXPORTADO
+    // -------------------------------------------------------------
+    function gerarHtmlFinal() {
+      if (tipoAtual === 'blocos') {
+        const visiveis = botoesBlocos.filter(b => b.ativo);
+        if (!visiveis.length) {
+          return `<div class="menu-container-s">\n  <!-- Nenhum botão selecionado -->\n</div>\n\n${CSS_BLOCOS}`;
+        }
+        const links = visiveis.map(btn => {
+          let classes = ['menu-button-s'];
+          if (btn.classeExtra) classes.push(btn.classeExtra);
+          const target = btn.targetBlank ? ' target="_blank"' : '';
+          const href = btn.url.trim() ? btn.url.trim() : '#';
+          return `  <a href="${href}"${target} class="${classes.join(' ')}">\n    ${btn.texto}\n  </a>`;
+        }).join('\n\n');
+
+        return `<div class="menu-container-s">\n${links}\n</div>\n\n${CSS_BLOCOS}`;
+      } else {
+        const visiveis = botoesIcones.filter(b => b.ativo);
+        let itens = '';
+        if (!visiveis.length) {
+          itens = '        <!-- Nenhum botão visível selecionado -->';
+        } else {
+          itens = visiveis.map(btn => {
+            const target = btn.targetBlank ? ' target="_blank"' : '';
+            const href = btn.url.trim() ? btn.url.trim() : '#';
+            return `        <a href="${href}" class="menu-item-i"${target}>
+            <img src="${btn.imgSrc}" alt="${btn.texto}">
+            <p class="menu-text-i">${btn.texto}</p>
+        </a>`;
+          }).join('\n        \n');
+        }
+
+        return `<div class="menu-container-i">
+
+    <div class="menu-row-i">
+        
+${itens}
+
+    </div>
+    
+</div>
+
+${CSS_ICONES}`;
+      }
+    }
+
+    function atualizar() {
+      const output = gerarHtmlFinal();
+      document.getElementById('code-output').value = output;
+      document.getElementById('preview-mount').innerHTML = output;
+    }
+
+    // -------------------------------------------------------------
+    // OPERAÇÕES: MENU EM BLOCOS
+    // -------------------------------------------------------------
+    function atualizarVisibilidadeBloco(index, valor) {
+      botoesBlocos[index].ativo = valor;
+      renderEditor();
+      atualizar();
+    }
+
+    function atualizarUrlBloco(index, valor) {
+      botoesBlocos[index].url = valor;
+      atualizar();
+    }
+
+    function atualizarTextoBloco(index, valor) {
+      botoesBlocos[index].texto = valor;
+      atualizar();
+    }
+
+    function atualizarTargetBloco(index, valor) {
+      botoesBlocos[index].targetBlank = valor;
+      atualizar();
+    }
+
+    function moverBloco(index, direcao) {
+      const novoIndex = index + direcao;
+      if (novoIndex < 0 || novoIndex >= botoesBlocos.length) return;
+      const [item] = botoesBlocos.splice(index, 1);
+      botoesBlocos.splice(novoIndex, 0, item);
+      renderEditor();
+      atualizar();
+    }
+
+    function aplicarPresetBlocos(modo) {
+      if (modo === 'todos') {
+        botoesBlocos.forEach(b => b.ativo = true);
+      } else {
+        botoesBlocos.forEach(b => b.ativo = true);
+      }
+      renderEditor();
+      atualizar();
+    }
+
+    // -------------------------------------------------------------
+    // OPERAÇÕES: MENU COM ÍCONES
+    // -------------------------------------------------------------
+    function atualizarVisibilidadeIcone(index, valor) {
+      botoesIcones[index].ativo = valor;
+      renderEditor();
+      atualizar();
+    }
+
+    function atualizarUrlIcone(index, valor) {
+      botoesIcones[index].url = valor;
+      atualizar();
+    }
+
+    function atualizarTextoIcone(index, valor) {
+      botoesIcones[index].texto = valor;
+      atualizar();
+    }
+
+    function atualizarTargetIcone(index, valor) {
+      botoesIcones[index].targetBlank = valor;
+      atualizar();
+    }
+
+    function moverIcone(index, direcao) {
+      const novoIndex = index + direcao;
+      if (novoIndex < 0 || novoIndex >= botoesIcones.length) return;
+      const [item] = botoesIcones.splice(index, 1);
+      botoesIcones.splice(novoIndex, 0, item);
+      renderEditor();
+      atualizar();
+    }
+
+    function editarImagemUrl(index) {
+      const atual = botoesIcones[index].imgSrc;
+      const novo = prompt('Insira o link da imagem (URL direta):', atual);
+      if (novo && novo.trim()) {
+        botoesIcones[index].imgSrc = novo.trim();
+        renderEditor();
+        atualizar();
+      }
+    }
+
+    function adicionarIconeCustom() {
+      const nome = prompt('Nome do novo botão:', 'Novo Botão');
+      if (!nome) return;
+      const urlImg = prompt('URL da imagem/ícone:', 'https://digital.unisa.br/mod/resource/view.php?id=1644084&redirect=1');
+      botoesIcones.push({
+        id: 'custom-' + Date.now(),
+        texto: nome.trim(),
+        imgSrc: urlImg ? urlImg.trim() : '',
+        url: '#',
+        targetBlank: false,
+        ativo: true,
+        isCustom: true
+      });
+      renderEditor();
+      atualizar();
+    }
+
+    function removerIconeCustom(index) {
+      if (confirm('Deseja excluir este botão personalizado?')) {
+        botoesIcones.splice(index, 1);
+        renderEditor();
+        atualizar();
+      }
+    }
+
+    function aplicarPresetIcones(preset) {
+      if (preset === 'todos') {
+        botoesIcones.forEach(b => b.ativo = true);
+      } else if (preset === 'limpar') {
+        botoesIcones.forEach(b => b.ativo = false);
+      } else if (preset === 'padrao') {
+        const padroes = ['aula-ao-vivo', 'avaliacao-continua', 'avaliacao-integrada', 'avaliacao-global', 'material-apoio'];
+        botoesIcones.forEach(b => b.ativo = padroes.includes(b.id));
+      } else if (preset === 'tcc') {
+        const focoTcc = ['orientacao-supervisao', 'entrega-relatorio', 'entrega-pi', 'entrega-tcc', 'material-apoio'];
+        botoesIcones.forEach(b => b.ativo = focoTcc.includes(b.id));
+      }
+      renderEditor();
+      atualizar();
+    }
+
+    // -------------------------------------------------------------
+    // CONTROLES DE INTERFACE
+    // -------------------------------------------------------------
+    function setViewMode(mode) {
+      ['btn-view-both', 'btn-view-editor', 'btn-view-preview'].forEach(id => document.getElementById(id).classList.remove('active'));
+      const builder = document.getElementById('builder-panel');
+      const preview = document.getElementById('preview-panel');
+      const resizer = document.getElementById('resizer-bar');
+
+      if (mode === 'editor-only') {
+        builder.style.display = 'flex'; builder.style.width = '100%'; builder.style.maxWidth = '100%';
+        resizer.style.display = 'none'; preview.style.display = 'none';
+        document.getElementById('btn-view-editor').classList.add('active');
+      } else if (mode === 'preview-only') {
+        builder.style.display = 'none'; resizer.style.display = 'none';
+        preview.style.display = 'flex'; preview.style.width = '100%';
+        document.getElementById('btn-view-preview').classList.add('active');
+      } else {
+        builder.style.display = 'flex'; builder.style.width = '530px'; builder.style.maxWidth = 'calc(100vw - 360px)';
+        resizer.style.display = 'flex'; preview.style.display = 'flex'; preview.style.width = '';
+        document.getElementById('btn-view-both').classList.add('active');
+      }
+    }
+
+    function mudarAba(aba) {
+      document.getElementById('tab-preview-btn').classList.toggle('active', aba === 'preview');
+      document.getElementById('tab-code-btn').classList.toggle('active', aba === 'code');
+      document.getElementById('preview-tab').style.display = aba === 'preview' ? 'block' : 'none';
+      document.getElementById('code-tab').style.display = aba === 'code' ? 'block' : 'none';
+    }
+
+    function copiarCodigo() {
+      const codigo = document.getElementById('code-output').value;
+      navigator.clipboard.writeText(codigo).then(() => {
+        const btn = document.getElementById('btn-copiar');
+        const originalText = btn.innerText;
+        btn.innerText = 'Copiado com Sucesso!';
+        btn.style.background = '#10b981';
+        setTimeout(() => {
+          btn.innerText = originalText;
+          btn.style.background = '';
+        }, 1800);
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Inicialização do divisor arrastável
+    (function initResizer() {
+      const resizer = document.getElementById('resizer-bar');
+      const panel = document.getElementById('builder-panel');
+      let isDragging = false;
+
+      resizer.addEventListener('mousedown', () => {
+        isDragging = true;
+        resizer.classList.add('dragging');
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const containerRect = document.querySelector('.app-container').getBoundingClientRect();
+        let newW = e.clientX - containerRect.left;
+        if (newW < 340) newW = 340;
+        if (newW > containerRect.width - 360) newW = containerRect.width - 360;
+        panel.style.width = `${newW}px`;
+      });
+
+      document.addEventListener('mouseup', () => {
+        if (isDragging) {
+          isDragging = false;
+          resizer.classList.remove('dragging');
+          document.body.style.cursor = '';
+          document.body.style.userSelect = '';
+        }
+      });
+    })();
+
+    // Início
+    renderEditor();
+    atualizar();
+  </script>
+</body>
+</html>
